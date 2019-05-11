@@ -1,0 +1,32 @@
+{
+  "name": "Google bot",
+  "version": "1.0.0",
+  "description": "Find customers from google requests",
+  "main": "none",
+  "dependencies": {
+    "babel-core": "*",
+    "babel-polyfill": "^6.26.0",
+    "chromedriver": "*",
+    "log4js": "",
+    "phantomjs": "*",
+    "promise": "",
+    "regenerator-runtime": "^0.13.1",
+    "selenium-webdriver": "*"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.0.20",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-polyfill": "^6.0.16",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-es2015": "^6.0.15",
+    "babel-preset-stage-0": "^6.0.15"
+  },
+  "scripts": {
+    "build": "babel googleBot/googlebot.js -d dist",
+    "alena-hash-likes": "node likebot/index.js",
+    "google-bot": "npm run build && node dist/googleBot/googlebot.js"
+  },
+  "author": "Konstantin Pozdnikin",
+  "license": ""
+}
