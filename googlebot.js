@@ -26,7 +26,7 @@ const browser = new webdriver
 
 browser.manage().window().setSize(1024, 700);
 
-// getPage();
+getPage();
 
 async function getPage() {
   //логинимся
@@ -34,27 +34,26 @@ async function getPage() {
   browser.sleep(settings.sleep_delay);
   browser.findElement(by.xpath(xpathSearchInput)).sendKeys(settings.requests[0]);
   const searchButton = await browser.findElement(by.xpath(xpathSearchButton)).click();
-  const elementsBlock = await browser.findElement(by.xpath(xpathResultsBlock));
-  // console.log('elementsBlock', elementsBlock);
+  const elementsBlock = await browser.findElement(by.id('rso'));
   const aLinks = await elementsBlock.findElements(By.css('.r a'));
-  // console.log('aLinks', aLinks);
-  aLinks.map((elem) => {
-    manageLink(elem, aLinks.length);
-  });
+  // перебираем все сылки на сайты
+  for (let i = 0; i < aLinks.length; i++) {
+    await manageLink(aLinks[i]);
+  }
+  // когда пебербали все ссылки, начинаем искать email адреса
+  console.log('customersLinks', customersLinks);
+  for (let i = 0; i < customersLinks.length; i++) {
+    await manageLinks(i);
+  }
 }
 
-async function manageLink(elem, count) {
+// собираем в массив те ссылки, которые содержат адреса кастомеров
+async function manageLink(elem) {
   try {
     const elemLink = await elem.getAttribute("href");
     index++;
     if (elemLink.indexOf('google') === -1) {
-      console.log('elemLink', elemLink);
       customersLinks.push(elemLink);
-    }
-    console.log('index', index, 'count', count);
-    if (index === count - 1){
-      console.log('customersLinks', customersLinks);
-      manageLinks(customersLinks[0]);
     }
   }
   catch (err) {
@@ -63,13 +62,19 @@ async function manageLink(elem, count) {
 }
 
 async function manageLinks(ind) {
-  const elemLink = customersLinks[ind];
-  browser.get(elemLink);
-  browser.sleep(settings.sleep_delay);
-  const allLinks = await browser.findElements(By.css('a'));
-  allLinks.map((lnk) => {
-    findEmail(lnk);
-  })
+  try {
+    const elemLink = customersLinks[ind];
+    console.log('elemLink', elemLink);
+    browser.get(elemLink);
+    browser.sleep(settings.sleep_delay);
+    const allLinks = await browser.findElements(By.css('a'));
+    console.log('allLinks', allLinks.length);
+    allLinks.forEach((lnk) => {
+      findEmail(lnk);
+    })
+  } catch (e) {
+    console.log('manageLinks error', e);
+  }
 }
 
 async function findEmail(link) {
@@ -80,15 +85,6 @@ async function findEmail(link) {
     }
   }
   catch (err) {
-    // console.log('findEmail error', err);
+    // console.log('findEmail error');
   }
 }
-
-const closureFunc = (function() {
-  let counter = 0;
-  return function() {
-    counter += 1;
-    console.log('counter', counter);
-    return counter;
-  }
-})();
