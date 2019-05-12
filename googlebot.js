@@ -12,6 +12,7 @@ const By = webdriver.By;
 let customersLinks = [];
 let index = 0;
 let customersIndex = 0;
+let customersEmails = [];
 
 const xpathSearchInput = '//*[@id="tsf"]/div[2]/div/div[1]/div/div[1]/input';
 const xpathSearchButton = '//*[@id="tsf"]/div[2]/div/div[3]/center/input[1]';
@@ -45,6 +46,7 @@ async function getPage() {
   for (let i = 0; i < customersLinks.length; i++) {
     await manageLinks(i);
   }
+  console.log('customersEmails', customersEmails);
 }
 
 // собираем в массив те ссылки, которые содержат адреса кастомеров
@@ -69,9 +71,9 @@ async function manageLinks(ind) {
     browser.sleep(settings.sleep_delay);
     const allLinks = await browser.findElements(By.css('a'));
     console.log('allLinks', allLinks.length);
-    allLinks.forEach((lnk) => {
-      findEmail(lnk);
-    })
+    for (let i = 0; i < allLinks.length; i++) {
+      await findEmail(allLinks[i]);
+    }
   } catch (e) {
     console.log('manageLinks error', e);
   }
@@ -82,6 +84,9 @@ async function findEmail(link) {
     const href = await link.getAttribute("href");
     if (href.indexOf('mailto:') !== -1) {
       console.log('href', href);
+      if (customersEmails.indexOf(href) === -1) {
+        customersEmails.push(href);
+      }
     }
   }
   catch (err) {
