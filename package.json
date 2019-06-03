@@ -7,6 +7,7 @@
     "babel-core": "*",
     "babel-polyfill": "^6.26.0",
     "chromedriver": "*",
+    "fs": "0.0.1-security",
     "log4js": "",
     "phantomjs": "*",
     "promise": "",

@@ -4,6 +4,7 @@ import webdriver from 'selenium-webdriver';
 import chrome from 'selenium-webdriver/chrome';
 import chromedriver from 'chromedriver';
 import Promise from 'promise';
+import fs from 'fs';
 import settings from './settings.json';
 
 const by = webdriver.By;
@@ -92,4 +93,35 @@ async function findEmail(link) {
   catch (err) {
     // console.log('findEmail error');
   }
+}
+
+async function readFileAsync() {
+  fs.readFile("emails.txt", "utf8", (error, data) => {
+      console.log("Асинхронное чтение файла");
+      if(error) throw error; // если возникла ошибка
+      console.log(data);  // выводим считанные данные
+      manageEmailsFile(data);
+    });
+}
+
+async function writeFileAsync(data) {
+  fs.writeFile("hello.txt", data, (error) => {
+    if(error) throw error; // если возникла ошибка
+    console.log("Асинхронная запись файла завершена. Содержимое файла:");
+  });
+}
+
+async function manageEmailsFile() {
+
+}
+
+// возвращает массив данных из файла и памяти без повторений
+function checkForRepeats(fileDataString, memoryDataArray) {
+  const fileDataArray = fileDataString.split(',');
+  memoryDataArray.forEach((elem) => {
+    if (fileDataString.indexOf(elem) === -1) {
+      fileDataArray.push(elem);
+    }
+  });
+  return fileDataArray;
 }
