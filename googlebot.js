@@ -9,7 +9,7 @@ import settings from './settings.json';
 
 const by = webdriver.By;
 const By = webdriver.By;
-
+let allLinks = [];
 let customersLinks = [];
 let index = 0;
 let customersIndex = 0;
@@ -18,6 +18,7 @@ let customersEmails = [];
 const xpathSearchInput = '//*[@id="tsf"]/div[2]/div/div[1]/div/div[1]/input';
 const xpathSearchButton = '//*[@id="tsf"]/div[2]/div/div[3]/center/input[1]';
 const xpathResultsBlock = '//*[@id="rso"]/div[2]/div';
+const xPathSecondPage = '//*[@id="nav"]/tbody/tr/td[3]/a';
 
 chrome.setDefaultService(new chrome.ServiceBuilder(chromedriver.path).build());
 
@@ -35,18 +36,29 @@ async function getPage() {
   browser.get('https://www.google.com/');
   browser.sleep(settings.sleep_delay);
   browser.findElement(by.xpath(xpathSearchInput)).sendKeys(settings.requests[0]);
-  const searchButton = await browser.findElement(by.xpath(xpathSearchButton)).click();
-  const elementsBlock = await browser.findElement(by.id('rso'));
-  const aLinks = await elementsBlock.findElements(By.css('.r a'));
-  // перебираем все сылки на сайты
-  for (let i = 0; i < aLinks.length; i++) {
-    await manageLink(aLinks[i]);
+  await browser.findElement(by.xpath(xpathSearchButton)).click();
+  browser.sleep(settings.sleep_delay);
+  const pagesBlock = browser.findElement(by.id('nav'));
+  const pageLinks = await pagesBlock.findElements(By.css('.fl'));
+  console.log('pageLinks', pageLinks.length);
+  // перебираем все страницы и все ссылки на сайт
+  for (let j = 0; j < pageLinks.length; j++) {
+    // перебираем все сылки на сайты
+    const elementsBlock = await browser.findElement(by.id('rso'));
+    const aLinks = await elementsBlock.findElements(By.css('.r a'));
+    for (let i = 0; i < aLinks.length; i++) {
+      await manageLink(aLinks[i]);
+    }
+    await pageLinks[j].click();
+    browser.sleep(settings.sleep_delay);
   }
   // когда пебербали все ссылки, начинаем искать email адреса
   console.log('customersLinks', customersLinks);
-  for (let i = 0; i < customersLinks.length; i++) {
+  allLinks = allLinks.concat(customersLinks);
+  console.log('allLinks', allLinks);
+  /* for (let i = 0; i < customersLinks.length; i++) {
     await manageLinks(i);
-  }
+  }*/
   console.log('customersEmails', customersEmails);
 }
 
@@ -95,6 +107,7 @@ async function findEmail(link) {
   }
 }
 
+// считываем данные из файла и работаем с ними
 async function readFileAsync() {
   fs.readFile("emails.txt", "utf8", (error, data) => {
       console.log("Асинхронное чтение файла");
@@ -104,8 +117,10 @@ async function readFileAsync() {
     });
 }
 
-async function writeFileAsync(data) {
-  fs.writeFile("hello.txt", data, (error) => {
+// записываем данные в файл
+async function writeFileAsync(memoryDataArray) {
+  const data = memoryDataArray.join();
+  fs.writeFile("emails.txt", data, (error) => {
     if(error) throw error; // если возникла ошибка
     console.log("Асинхронная запись файла завершена. Содержимое файла:");
   });

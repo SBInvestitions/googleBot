@@ -24,9 +24,7 @@
     "babel-preset-stage-0": "^6.0.15"
   },
   "scripts": {
-    "build": "babel googleBot/googlebot.js -d dist",
-    "alena-hash-likes": "node likebot/index.js",
-    "google-bot": "npm run build && node dist/googleBot/googlebot.js"
+    "googlebot": "npm run index.js"
   },
   "author": "Konstantin Pozdnikin",
   "license": ""
