@@ -18,7 +18,16 @@ let customersEmails = [];
 const xpathSearchInput = '//*[@id="tsf"]/div[2]/div/div[1]/div/div[1]/input';
 const xpathSearchButton = '//*[@id="tsf"]/div[2]/div/div[3]/center/input[1]';
 const xpathResultsBlock = '//*[@id="rso"]/div[2]/div';
-const xPathSecondPage = '//*[@id="nav"]/tbody/tr/td[3]/a';
+const xPath2Page = '//*[@id="nav"]/tbody/tr/td[3]/a';
+const xPath3Page = '//*[@id="nav"]/tbody/tr/td[4]/a';
+const xPath4Page = '//*[@id="nav"]/tbody/tr/td[5]/a';
+const xPath5Page = '//*[@id="nav"]/tbody/tr/td[6]/a';
+const xPath6Page = '//*[@id="nav"]/tbody/tr/td[7]/a';
+const xPath7Page = '//*[@id="nav"]/tbody/tr/td[8]/a';
+const xPath8Page = '//*[@id="nav"]/tbody/tr/td[9]/a';
+const xPath9Page = '//*[@id="nav"]/tbody/tr/td[10]/a';
+const xPath10Page = '//*[@id="nav"]/tbody/tr/td[11]/a';
+
 
 chrome.setDefaultService(new chrome.ServiceBuilder(chromedriver.path).build());
 
@@ -38,28 +47,40 @@ async function getPage() {
   browser.findElement(by.xpath(xpathSearchInput)).sendKeys(settings.requests[0]);
   await browser.findElement(by.xpath(xpathSearchButton)).click();
   browser.sleep(settings.sleep_delay);
-  const pagesBlock = browser.findElement(by.id('nav'));
-  const pageLinks = await pagesBlock.findElements(By.css('.fl'));
-  console.log('pageLinks', pageLinks.length);
+
   // перебираем все страницы и все ссылки на сайт
-  for (let j = 0; j < pageLinks.length; j++) {
-    // перебираем все сылки на сайты
+  for (let j = 1; j < 10; j++) {
     const elementsBlock = await browser.findElement(by.id('rso'));
     const aLinks = await elementsBlock.findElements(By.css('.r a'));
-    for (let i = 0; i < aLinks.length; i++) {
+    console.log('aLinks', aLinks.length);
+    /*for (let i = 0; i < aLinks.length; i++) {
       await manageLink(aLinks[i]);
+    }*/
+    // когда пебербали все ссылки, начинаем искать email адреса
+    /*allLinks = allLinks.concat(customersLinks);
+    console.log('allLinks', allLinks);
+    for (let i = 0; i < customersLinks.length; i++) {
+      await manageLinks(i);
     }
-    await pageLinks[j].click();
+    console.log('customersEmails', customersEmails);
+    manageEmails();*/
+    // перебираем все сылки на сайты
+    const pageLink = await browser.findElement(by.xpath(`//*[@id="nav"]/tbody/tr/td[${j + 2}]/a`));
+    console.log('pageLink', pageLink);
+    await pageLink.click();
     browser.sleep(settings.sleep_delay);
+    console.log('clicked');
   }
-  // когда пебербали все ссылки, начинаем искать email адреса
-  console.log('customersLinks', customersLinks);
-  allLinks = allLinks.concat(customersLinks);
-  console.log('allLinks', allLinks);
-  /* for (let i = 0; i < customersLinks.length; i++) {
-    await manageLinks(i);
-  }*/
-  console.log('customersEmails', customersEmails);
+}
+
+async function findPageLinks(index) {
+  const pagesBlock = browser.findElement(by.id('nav'));
+  const pageLinks = await pagesBlock.findElements(by.xpath(`'/*[@id="nav"]/tbody/tr/td[${index + 2}]/a`));
+  if (pageLinks && pageLinks[index]) {
+    console.log('pageLinks', pageLinks.length);
+    return pageLinks[index]
+  }
+  return null;
 }
 
 // собираем в массив те ссылки, которые содержат адреса кастомеров
@@ -126,8 +147,12 @@ async function writeFileAsync(memoryDataArray) {
   });
 }
 
-async function manageEmailsFile() {
-
+async function manageEmails() {
+  const clearedEmails = [];
+  customersEmails.forEach((elem) => {
+    clearedEmails.push(elem.split(':')[1])
+  });
+  writeFileAsync(clearedEmails);
 }
 
 // возвращает массив данных из файла и памяти без повторений
