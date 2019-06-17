@@ -3,7 +3,6 @@
 import webdriver from 'selenium-webdriver';
 import chrome from 'selenium-webdriver/chrome';
 import chromedriver from 'chromedriver';
-import Promise from 'promise';
 import fs from 'fs';
 import settings from './settings.json';
 
@@ -12,21 +11,10 @@ const By = webdriver.By;
 let allLinks = [];
 let customersLinks = [];
 let globalIndex = 1;
-let customersIndex = 0;
 let customersEmails = [];
 
 const xpathSearchInput = '//*[@id="tsf"]/div[2]/div/div[1]/div/div[1]/input';
 const xpathSearchButton = '//*[@id="tsf"]/div[2]/div/div[3]/center/input[1]';
-const xpathResultsBlock = '//*[@id="rso"]/div[2]/div';
-const xPath2Page = '//*[@id="nav"]/tbody/tr/td[3]/a';
-const xPath3Page = '//*[@id="nav"]/tbody/tr/td[4]/a';
-const xPath4Page = '//*[@id="nav"]/tbody/tr/td[5]/a';
-const xPath5Page = '//*[@id="nav"]/tbody/tr/td[6]/a';
-const xPath6Page = '//*[@id="nav"]/tbody/tr/td[7]/a';
-const xPath7Page = '//*[@id="nav"]/tbody/tr/td[8]/a';
-const xPath8Page = '//*[@id="nav"]/tbody/tr/td[9]/a';
-const xPath9Page = '//*[@id="nav"]/tbody/tr/td[10]/a';
-const xPath10Page = '//*[@id="nav"]/tbody/tr/td[11]/a';
 
 
 chrome.setDefaultService(new chrome.ServiceBuilder(chromedriver.path).build());
